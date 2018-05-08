@@ -4,11 +4,11 @@ Flask demo server.
 
 from flask import Flask, request
 
-from smsdemo.constants import POST_PATH
+from smsdemo.constants import POST_PATH, SIGNATURE_HEADER_KEY
 from smsdemo.message import SMSMessage
 from smsdemo.util import (
     ServerConfig, SMSSendError,
-    get_epoch_from_header, webhook_sig_hs256,
+    parse_signature, generate_signature,
     sync_send,
 )
 
@@ -28,10 +28,12 @@ def receive_and_echo():
     msg = SMSMessage.from_payload(payload)
     app.logger.info("Received message: %s", msg)
 
-    sig = request.headers.get("X-Telnyx-Signature")
+    sig = request.headers.get(SIGNATURE_HEADER_KEY)
     raw_payload = request.data
-    epoch = get_epoch_from_header(sig)
-    expected_sig = webhook_sig_hs256(secret, raw_payload, epoch)
+    timestamp, _ = parse_signature(sig)
+    expected_sig = generate_signature(secret=secret,
+                                      payload=raw_payload,
+                                      timestamp=timestamp)
     if sig != expected_sig:
         app.logger.error("Invalid signature: %s (expected %s)", sig, expected_sig)
         return "Invalid signature", 400

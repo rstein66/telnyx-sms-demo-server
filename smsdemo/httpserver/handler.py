@@ -14,11 +14,11 @@ import logging
 import urllib.parse
 from typing import Mapping
 
-from smsdemo.constants import POST_PATH
+from smsdemo.constants import POST_PATH, SIGNATURE_HEADER_KEY
 from smsdemo.message import SMSMessage
 from smsdemo.util import (
     ServerConfig, SMSSendError,
-    get_epoch_from_header, webhook_sig_hs256,
+    parse_signature, generate_signature,
     sync_send,
 )
 
@@ -43,9 +43,11 @@ def handler_factory(conf: ServerConfig):
             msg = SMSMessage.from_payload(payload)
             logging.info("Received message: %s", msg)
 
-            sig = self.headers["X-Telnyx-Signature"]
-            epoch = get_epoch_from_header(sig)
-            expected_sig = webhook_sig_hs256(conf.secret, post_data, epoch)
+            sig = self.headers[SIGNATURE_HEADER_KEY]
+            timestamp, _ = parse_signature(sig)
+            expected_sig = generate_signature(secret=conf.secret,
+                                              payload=post_data,
+                                              timestamp=timestamp)
             if sig != expected_sig:
                 logging.error("Invalid signature: %s (expected %s)",
                               sig, expected_sig)

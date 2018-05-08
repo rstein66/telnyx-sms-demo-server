@@ -5,7 +5,7 @@ setup(
     version='0.9.1',
     packages=['smsdemo', 'smsdemo.httpserver', 'smsdemo.flaskserver',
               'smsdemo.aiohttpserver'],
-    url='',
+    url='https://developers.telnyx.com/docs/messaging',
     license='MIT',
     author='Alex Lee; Michael McVady; X.D. Zhai',
     author_email='support@telnyx.com',

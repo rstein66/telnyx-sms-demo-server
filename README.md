@@ -4,7 +4,19 @@ This demonstration presents three implementations of an SMS echo server
 using Telnyx's SMS API. The first implementation uses the
 [aiohttp](http://aiohttp.readthedocs.io/en/stable/) library; the second
 uses [Flask](http://flask.pocoo.org/); and the third is built using the
-standard library's HTTPServer.
+standard library's [HTTPServer](https://docs.python.org/3/library/http.server.html).
+
+<!-- MarkdownTOC -->
+
+- [Overview](#overview)
+- [Implementations](#implementations)
+  - [aiohttp](#aiohttp)
+  - [Flask](#flask)
+  - [HTTPServer](#httpserver)
+- [Running a demo server](#running-a-demo-server)
+- [Miscellaneous notes](#miscellaneous-notes)
+
+<!-- /MarkdownTOC -->
 
 ## Overview
 
@@ -45,8 +57,7 @@ One POST route is added to the application and any blocking I/O
 operations such as reading request body and sending a request are
 handled asynchronously. (If you are not so familiar with asynchronous
 programming, there are a number of helpful tutorials out there, such as
-this [Asynchronous I/O
-Walkthrough](http://www.pgbovine.net/python-async-io-walkthrough.htm)).
+this [Asynchronous I/O Walkthrough](http://www.pgbovine.net/python-async-io-walkthrough.htm)).
 
 ### Flask
 
@@ -66,7 +77,7 @@ en/decoding.
 
 To solve the first problem, you need to wrap a factory function around
 the class definition and return the class back to the invoking function,
-as demonstrated in `smsdemo/httpserver/handler.py`. For the second
+as demonstrated in [`smsdemo/httpserver/handler.py`](smsdemo/httpserver/handler.py). For the second
 problem, you just have to be careful with classic Unicode vs bytes
 distinction.
 
@@ -75,15 +86,15 @@ distinction.
 1. Clone the repository.
 2. Create a virtual environment (using
    [virtualenvwrapper](https://virtualenvwrapper.readthedocs.io/en/latest/)):
-   ```
+   ```shell
    user@sms-demo:~/sms-demo$ mkvirtualenv -p /usr/bin/python3 sms-demo
    ```
 3. Install dependencies:
-   ```
+   ```shell
    (sms-demo) user@sms-demo:~/sms-demo$ pip install -r requirements.txt
    ```
 4. Install this package under your path:
-   ```
+   ```shell
    (sms-demo) user@sms-demo:~/sms-demo$ python setup.py install
    ```
 5. Choose an implementation to run:
@@ -110,20 +121,16 @@ distinction.
    ```
 
 Please make sure that the `-s` parameter matches the message profile 
-secret that is set for your messaging profile in the [Telnyx Portal]
-(https://portal.telnyx.com/).
+secret that is set for your messaging profile in the [Telnyx Portal](https://portal.telnyx.com/).
 
 ## Miscellaneous notes
 
 1. We recommend setting up a python virtual environment while developing
    your application, so that your native environment is preserved. You
    can find more information about virtual environments
-   [here](http://python-guide.readthedocs.io/en/latest/dev/virtualenvs/).
+   [here](http://python-guide.readthedocs.io/en/latest/dev/virtualenvs/).  
 2. Please avoid hard coding your messaging profile secret for sending
    SMS in the production environment. If your secret is ever
-   compromised, be sure to generate a new one through the [Telnyx
-   Portal](https://portal.telnyx.com/).
+   compromised, be sure to generate a new one through the [Telnyx Portal](https://portal.telnyx.com/).
 3. There are of course many other options for implementing such servers,
-   e.g. by using the [Twisted
-   framework](https://twistedmatrix.com/trac/). We would love to expand
-   these demo servers and would welcome any contributions.
+   e.g. by using the [Twisted framework](https://twistedmatrix.com/trac/). We would love to expand these demo servers and would welcome any contributions.

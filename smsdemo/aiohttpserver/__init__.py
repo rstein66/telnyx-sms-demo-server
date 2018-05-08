@@ -6,11 +6,11 @@ import logging
 
 from aiohttp import web
 
-from smsdemo.constants import POST_PATH
+from smsdemo.constants import POST_PATH, SIGNATURE_HEADER_KEY
 from smsdemo.message import SMSMessage
 from smsdemo.util import (
     ServerConfig, SMSSendError,
-    get_epoch_from_header, webhook_sig_hs256,
+    parse_signature, generate_signature,
     async_send,
 )
 
@@ -28,10 +28,12 @@ async def receive_and_echo(request):
     msg = SMSMessage.from_payload(payload)
     logging.info("Received message: %s", msg)
 
-    sig = request.headers.get("X-Telnyx-Signature")
+    sig = request.headers.get(SIGNATURE_HEADER_KEY)
     raw_payload = await request.read()
-    epoch = get_epoch_from_header(sig)
-    expected_sig = webhook_sig_hs256(secret, raw_payload, epoch)
+    timestamp, _ = parse_signature(sig)
+    expected_sig = generate_signature(secret=secret,
+                                      payload=raw_payload,
+                                      timestamp=timestamp)
     if sig != expected_sig:
         logging.error("Invalid signature: %s (expected %s)", sig, expected_sig)
         return web.HTTPBadRequest(text="Invalid signature")
