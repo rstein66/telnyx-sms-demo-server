@@ -8,8 +8,7 @@ import hmac
 from base64 import b64encode
 from collections import namedtuple
 from datetime import datetime
-from typing import Mapping, Optional, Tuple, Union
-import json
+from typing import Optional, Tuple, Union
 
 import requests
 from aiohttp import ClientSession, ClientError
@@ -17,7 +16,6 @@ from aiohttp import ClientSession, ClientError
 from smsdemo.constants import (
     MESSAGES_ENDPOINT,
     SECRET_HEADER_KEY,
-    SIGNATURE_HEADER_KEY,
 )
 from smsdemo.message import SMSMessage
 
@@ -104,7 +102,7 @@ def generate_signature(secret: str,
 def parse_signature(signature_value: str) -> Tuple:
     """Extracts Unix time and hash from the webhook signature header value."""
 
-    signature_map = dict(param.split("=", 1) for param in header_value.split(","))
+    signature_map = dict(param.split("=", 1) for param in signature_value.split(","))
     timestamp = signature_map["t"]
     b64_encoded_hash = signature_map["h"]
 
